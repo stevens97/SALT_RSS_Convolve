@@ -173,11 +173,9 @@ def convolve(work_dir, src1, ARC1, ctr1, src2, ARC2, ctr2):
 
     # Open first FITS image
     hdu_1 = fits.open('{}'.format(src1))
-    img_1 = hdu_1[0].data
 
     # Open second FITS image
     hdu_2 = fits.open('{}'.format(src2))
-    img_2 = hdu_2[0].data
 
     # Calculate instrumental FWHM resolutions of both images
     FWHM_1, FWHM_1_err = FWHM_calc(ARC1, ctr1)
@@ -192,9 +190,11 @@ def convolve(work_dir, src1, ARC1, ctr1, src2, ARC2, ctr2):
 
     # Convolve the images to match the lowest resolution
     if FWHM_1 < FWHM_2:
-        hdu_1[0].data = gaussian_filter(img_1, sigma=delta_sigma)
+        for i in range(len(hdu_1[0].data)):
+            hdu_1[0].data[i] = gaussian_filter(hdu_1[0].data[i], sigma=delta_sigma)
     elif FWHM_2 < FWHM_1:
-        hdu_2[0].data = gaussian_filter(img_2, sigma=delta_sigma)
+        for i in range(len(hdu_2[0].data)):
+            hdu_2[0].data[i] = gaussian_filter(hdu_2[0].data[i], sigma=delta_sigma)
 
     # Get basenames of source files
     name1 = Path(src1).stem
